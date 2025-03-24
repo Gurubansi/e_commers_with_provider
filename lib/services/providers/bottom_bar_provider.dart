@@ -10,7 +10,7 @@ class BottomBarProvider extends ChangeNotifier{
 
   // List of screens to display
   final List<Widget> _screens = [
-    const HomeScreen(),
+     HomeScreen(),
     const SearchScreen(),
     const FavoriteScreen(),
     const AddToCartScreen(),
