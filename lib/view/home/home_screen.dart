@@ -1,3 +1,6 @@
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:e_commerce_with_provider/services/models/shoes_model.dart';
+import 'package:e_commerce_with_provider/services/providers/home__provider.dart';
 import 'package:e_commerce_with_provider/utils/CommonSizedBox.dart';
 import 'package:e_commerce_with_provider/view/home/add_to_cart_screen.dart';
 import 'package:e_commerce_with_provider/view/home/bottom_bar.dart';
@@ -5,15 +8,18 @@ import 'package:e_commerce_with_provider/view/home/favorite_screen.dart';
 import 'package:e_commerce_with_provider/view/home/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
    HomeScreen({super.key});
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  
   @override
   Widget build(BuildContext context) {
+    final homeProvider = Provider.of<HomeProvider>(context);
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: Colors.grey.shade100,
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -140,9 +146,196 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ],
               ),
-            )
+            ),
             /// add banner
+            boxH20(),
+            CarouselSlider(
+              options: CarouselOptions(
+                height: 180.0,
+                autoPlay: true,
+                enlargeCenterPage: true,
+              ),
+              items: homeProvider.bannerImg.map((imgPath) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                      decoration: BoxDecoration(color: Colors.grey.shade200),
+                      child: Image.asset(
+                        imgPath,
+                        fit: BoxFit.cover,
+                      ),
+                    );
+                  },
+                );
+              }).toList(),
+            ),
+            boxH10(),
+            /// brand section title
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+              child: Row(
+                children: [
+                  Text(
+                    'Top Brands',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+            boxH10(),
+            SizedBox(
+              height: 100,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: homeProvider.brand.length,
+                itemBuilder: (context, index) {
+                  String brandName = homeProvider.brand.keys.elementAt(index);
+                  String imagePath = homeProvider.brand[brandName]!;
+                  return Container(
+                    width: 100,
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
 
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          flex: 5,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Image.asset(
+                              imagePath,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            brandName,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+            boxH15(),
+            /// brand section title
+            // const Padding(
+            //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+            //   child: Row(
+            //     children: [
+            //       Text(
+            //         'Popular',
+            //         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            Expanded(
+              child: GridView.builder(
+                shrinkWrap: true,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 0.75,
+                ),
+                itemCount: shoesList.length,
+                itemBuilder: (context, index) {
+                  ShoesModel shoes = shoesList[index];
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.shade300,
+                          blurRadius: 6,
+                          offset: Offset(2, 4),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          /// Favorite icon
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: Icon(Icons.favorite_border, color: Colors.grey.shade600),
+                          ),
+
+                          /// Shoe image
+                          Center(
+                            child: Image.asset(
+                              shoes.image,
+                              height: 100,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+
+                          /// Shoe name
+                          Text(
+                            shoes.name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+
+                          /// Brand
+                          Text(
+                            shoes.brand,
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                          ),
+
+                          const Spacer(),
+
+                          /// Price + Rating row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                shoes.price,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  const Icon(Icons.star, color: Colors.amber, size: 16),
+                                  const SizedBox(width: 4),
+                                  Text(shoes.rating),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
 
           ],
         ),
